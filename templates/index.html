@@ -3,49 +3,45 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='uploads/styles.css') }}">
+    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
     <title>sustainify</title>
-    <style>
-      video,
-      canvas {
-        border: 1px solid black;
-      }
-    </style>
   </head>
   <body>
-    <div class="navbar">
-      <img src="PLACEHOLDER"
-    </div>
-    <div class="main-text">
-      <h1>Identify where your recycling goes!</h1>
-    </div>
-    <div class="main-body">
-      <div class="left-half">
-        <p>sustainify is a web app designed to help individuals and families make informed decisions about waste disposal. No more confusion, no more improper disposal!</p>
-        <p>This tool was inspired by the <span id="goals" href="https://sdgs.un.org/goals">Responsible Consumption and Production</span> goal of the United Nation's 17 Sustainable Development Goals.</p>
-        <button></button>
-        <hr>
-        <button></button>
-      </div>
-      <div class="right-half">
-        <form action="/upload" method="post" enctype="multipart/form-data">
-          <input type="file" name="file" /><br />
-          <br />
-          <input type="submit" value="Upload" />
-        </form>
-    
-        <!-- Webcam Video Feed -->
-        <video id="video" width="640" height="480" autoplay></video>
-    
-        <!-- Capture Button -->
-        <button onclick="capture()">Capture</button>
-    
-        <!-- Form for Submitting Captured Images -->
-        <form id="captureForm" action="/upload-webcam" method="post" style="display: none;">
-          <input type="hidden" id="imageData" name="imageData" value="" />
-        </form>
-      </div>
-    </div>
+    <nav>
+      <h1 class="navtext">sust<span class="desc">ai</span>nify</h1>
+  </nav>
 
+  <div id="restofbody">
+      <div class="slogan">
+          <h1>Identify where your reycling goes!</h1>
+      </div>
+      <div class="mainbody">
+          <div class="left">
+              <p>sust<span class="desc">ai</span>nify is a web app designed to <br> help individuals and families make <br> informed decisions about waste <br> disposal. No more confusion, no more <br> improper disposal!</p>
+              <p>This tool was inspired by the <br> <a href="https://sdgs.un.org/goals/goal12" class="link"> Responsible Consumption and <br> Production</a> goal of the United Nation's <br>17 Sustainable Development Goals. </p>
+              <form class="video" action="/upload" method="post" enctype="multipart/form-data">
+                  <input type="file" class="submit">
+                  <hr>
+                  <input class="submit" type="submit" value="Submit">
+                </form>
+          </div>
+
+          <div class="right">
+                <video id="video" width="640" height="480" autoplay></video>
+                <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+
+                <button class="capture" onclick="capture()">Capture Photo</button>
+
+                <form id="captureForm" action="/upload-webcam" method="post" style="display: none;">
+                    <input class="vidhidden" type="hidden" id="imageData" name="imageData" value="">
+                </form>
+          </div>
+
+      </div>
+  </div>
+
+    
     <script>
       // Initialize Webcam on Page Load
       document.addEventListener("DOMContentLoaded", function () {

@@ -32,13 +32,14 @@ def upload_file():
         prediction = model.predict(filepath, confidence=40, overlap=30).json()
 
         object_type = prediction['predictions'][0]['class']
+        prediction['predictions'][0]['confidence'] = int(round(prediction['predictions'][0]['confidence'], 2) * 100)
         prompt = f"How should I properly dispose of {object_type} waste?"
         
         response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "You are a helpful assistant that provides instructions on how to dispose of different types of waste."},
-            {"role": "user", "content": f"How do I properly dispose of {object_type} waste?"}
+            {"role": "system", "content": "You are a helpful assistant that provides instructions on how to dispose of different types of waste. Give your answer within 100 words. Please include a newline character before everyone bullet point you make."},
+            {"role": "user", "content": f"How do I properly dispose of {object_type} waste? What are some side effects of improper disposal?"}
         ])
 
         disposal_instruction = response['choices'][0]['message']['content'].strip()
@@ -59,7 +60,7 @@ def upload_webcam():
 
     # Now you can process the image with your model
     prediction = model.predict(image_path, confidence=40, overlap=30).json()
-
+    prediction['predictions'][0]['confidence'] = int(round(prediction['predictions'][0]['confidence'], 2) * 100)
     object_type = prediction['predictions'][0]['class']
 
     response = openai.ChatCompletion.create(
@@ -79,8 +80,7 @@ def upload_webcam():
 def index():
     return render_template('index.html')
 
-if not os.path.exists('uploads'):
-    os.makedirs('uploads')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
