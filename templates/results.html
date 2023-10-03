@@ -4,22 +4,23 @@
     <meta charset="utf-8">
     <title>Results</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
 </head>
-<body>
+<body style="background-color: #2a2a2a; font-family: 'Inter'">
 
 <div class="container mt-5">
-    <h1>Results</h1>
+    <h1 style="color: #0AC132">Results</h1>
 
     <div class="row mt-4">
         <div class="col-md-6">
-            <h2>Prediction</h2>
-            <p><strong>Object Type:</strong> {{ prediction['predictions'][0]['class'] }}</p> 
-            <p><strong>Confidence:</strong> {{ prediction['predictions'][0]['confidence'] }}%</p> <!-- Update according to your actual JSON structure -->
-            <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Uploaded Image">
+            <h2 style="color:#0AC132">Prediction</h2>
+            <p style="color: white;"><strong style="color:#0AC132">Object Type:</strong> {{ prediction['predictions'][0]['class'] }}</p> 
+            <p style="color: white;"><strong style="color:#0AC132">Confidence:</strong> {{ prediction['predictions'][0]['confidence'] }}%</p> <!-- Update according to your actual JSON structure -->
+            <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Uploaded Image" style="max-width: 500px;">
         </div>
         <div class="col-md-6">
-            <h2>Disposal Instruction</h2>
-            <p>{{ disposal_instruction }}</p>
+            <h2 style="color:#0AC132">Disposal Instruction</h2>
+            <p style="color:white;">{{ disposal_instruction }}</p>
         </div>
     </div>
 
