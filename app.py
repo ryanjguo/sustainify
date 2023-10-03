@@ -1,45 +1,61 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify
+from werkzeug.utils import secure_filename
 from roboflow import Roboflow
 import os
-import cv2
-import numpy as np
+import json
+import base64
 
-# Load YOLO
-def load_yolo():
-    net = cv2.dnn.readNet("yolov3.weights", "yolov3.cfg")
-    with open("coco.names", "r") as f:
-        classes = [line.strip() for line in f.readlines()]
-    layers_names = net.getLayerNames()
-    output_layers = [layers_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
-    return net, classes, output_layers
-
-# Function for forward pass, drawing bounding box and showing image
-def detect_objects(img, net, outputLayers):  
-    blob = cv2.dnn.blobFromImage(img, scalefactor=0.00392, size=(320, 320), mean=(0, 0, 0), swapRB=True, crop=False)
-    net.setInput(blob)
-    detected_objects = net.forward(outputLayers)
-    return detected_objects
 
 app = Flask(__name__)
 
-# Function to download dataset
-def download_dataset():
-    try:
-        rf = Roboflow(api_key=os.environ.get("ROBOFLOW_API_KEY"))  # Use environment variable to store API key
-        project = rf.workspace("trash-detection-qzyd2").project("combined-u0h0t")
-        dataset = project.version(4).download("yolov8")
-        return dataset
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        return None
+rf = Roboflow(api_key=os.environ.get("ROBOFLOW_API_KEY"))
+project = rf.workspace().project("garbage-classification-3")
+model = project.version(2).model
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        print('No file part')
+        return redirect(request.url)
+    file = request.files['file']
+    if file.filename == '':
+        print('No selected file')
+        return redirect(request.url)
+    if file:
+        filename = secure_filename(file.filename)
+        filepath = os.path.join('uploads', filename)
+        file.save(filepath)
+        
+        # Make prediction
+        prediction = model.predict(filepath, confidence=40, overlap=30).json()
+        prediction_json = json.dumps(prediction, indent=4)  # Format prediction as JSON string for display
+
+        return render_template('results.html', filename=filename, prediction=prediction_json)
+    
+@app.route('/upload-webcam', methods=['POST'])
+def upload_webcam():
+    image_data = request.form['imageData'].split(',')[1]  # Get the data part of the image
+    image_data = base64.b64decode(image_data)  # Decode the base64 image data
+
+    image_path = 'image.png'
+    # Save the image to a file
+    with open(image_path, 'wb') as image_file:
+        image_file.write(image_data)
+
+    # Now you can process the image with your model
+    prediction = model.predict(image_path, confidence=40, overlap=30).json()
+
+    # Render the results template with the predictions
+    return render_template('results.html', prediction=prediction)
+
 
 @app.route('/')
 def index():
-    dataset = download_dataset()
-    if dataset:
-        return render_template('index.html', dataset_info="Dataset downloaded successfully.")
-    else:
-        return render_template('index.html', dataset_info="Failed to download dataset.")
+    return render_template('index.html')
+
+if not os.path.exists('uploads'):
+    os.makedirs('uploads')
 
 if __name__ == '__main__':
     app.run(debug=True)
+
