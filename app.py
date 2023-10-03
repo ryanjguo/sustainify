@@ -4,13 +4,15 @@ from roboflow import Roboflow
 import os
 import json
 import base64
-
+import openai
 
 app = Flask(__name__)
 
 rf = Roboflow(api_key=os.environ.get("ROBOFLOW_API_KEY"))
 project = rf.workspace().project("garbage-classification-3")
 model = project.version(2).model
+
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -28,9 +30,21 @@ def upload_file():
         
         # Make prediction
         prediction = model.predict(filepath, confidence=40, overlap=30).json()
-        prediction_json = json.dumps(prediction, indent=4)  # Format prediction as JSON string for display
 
-        return render_template('results.html', filename=filename, prediction=prediction_json)
+        object_type = prediction['predictions'][0]['class']
+        prompt = f"How should I properly dispose of {object_type} waste?"
+        
+        response = openai.Completion.create(
+        engine="gpt-3.5-turbo-instruct",
+        prompt=prompt,
+        temperature=0.5,
+        max_tokens=200,
+        top_p=0.5
+    )
+
+        disposal_instruction = response.choices[0].text.strip()
+
+        return render_template('results.html', filename=filename, prediction=prediction, disposal_instruction=disposal_instruction)
     
 @app.route('/upload-webcam', methods=['POST'])
 def upload_webcam():
@@ -45,9 +59,21 @@ def upload_webcam():
     # Now you can process the image with your model
     prediction = model.predict(image_path, confidence=40, overlap=30).json()
 
-    # Render the results template with the predictions
-    return render_template('results.html', prediction=prediction)
+    object_type = prediction['predictions'][0]['class']
+    prompt = f"How to properly dispose of {object_type} waste? Provide clear and concise steps or methods that are environmentally friendly and widely acceptable. Avoid repetitive or overly general advice. [max tokens=200]"
 
+    response = openai.Completion.create(
+        engine="gpt-3.5-turbo-instruct",
+        prompt=prompt,
+        temperature=0.5,
+        max_tokens=200,
+        top_p=0.5
+    )
+    
+    disposal_instruction = response.choices[0].text.strip()
+
+    # Return the results as JSON
+    return render_template('results.html', prediction=prediction, disposal_instruction=disposal_instruction)
 
 @app.route('/')
 def index():

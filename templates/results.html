@@ -1,26 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Results</title>
+  <meta charset="utf-8">
+  <title>Sustainify: Results</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
 
-<h1>Results</h1>
+<div class="container mt-5">
+    <h1>Results</h1>
 
-<!-- Displaying Prediction Result -->
-<p><strong>Prediction:</strong> {{ prediction }}</p>
+    <h2>Object Detection</h2>
+    <ul>
+        <li><strong>Object Type:</strong> {{ prediction.predictions[0].class }}</li>
+        <li><strong>Confidence:</strong> {{ prediction.predictions[0].confidence }}</li>
+    </ul>
 
-<!-- Displaying Uploaded Image -->
-{% if filename %}
-    <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Uploaded Image">
-{% endif %}
+    <h2>Disposal Instruction</h2>
+    <p>{{ disposal_instruction }}</p>
 
-<!-- Go Back Button -->
-<a href="{{ url_for('index') }}">
-    <button>Go Back</button>
-</a>
+    <a href="{{ url_for('index') }}" class="btn btn-primary">Go Back</a>
+</div>
 
 </body>
 </html>
