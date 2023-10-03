@@ -34,15 +34,14 @@ def upload_file():
         object_type = prediction['predictions'][0]['class']
         prompt = f"How should I properly dispose of {object_type} waste?"
         
-        response = openai.Completion.create(
-        engine="gpt-3.5-turbo-instruct",
-        prompt=prompt,
-        temperature=0.5,
-        max_tokens=200,
-        top_p=0.5
-    )
+        response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant that provides instructions on how to dispose of different types of waste."},
+            {"role": "user", "content": f"How do I properly dispose of {object_type} waste?"}
+        ])
 
-        disposal_instruction = response.choices[0].text.strip()
+        disposal_instruction = response['choices'][0]['message']['content'].strip()
 
         return render_template('results.html', filename=filename, prediction=prediction, disposal_instruction=disposal_instruction)
     
@@ -60,17 +59,18 @@ def upload_webcam():
     prediction = model.predict(image_path, confidence=40, overlap=30).json()
 
     object_type = prediction['predictions'][0]['class']
-    prompt = f"How to properly dispose of {object_type} waste? Provide clear and concise steps or methods that are environmentally friendly and widely acceptable. Avoid repetitive or overly general advice. [max tokens=200]"
+    # prompt = f"How to properly dispose of {object_type} waste? Provide clear and concise steps or methods that are environmentally friendly and widely acceptable. Avoid repetitive or overly general advice. [max tokens=200]"
 
-    response = openai.Completion.create(
-        engine="gpt-3.5-turbo-instruct",
-        prompt=prompt,
-        temperature=0.5,
-        max_tokens=200,
-        top_p=0.5
-    )
+    response = openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant that provides instructions on how to dispose of different types of waste."},
+        {"role": "user", "content": f"How do I properly dispose of {object_type} waste?"}
+    ])
+
+    disposal_instruction = response['choices'][0]['message']['content'].strip()
     
-    disposal_instruction = response.choices[0].text.strip()
+    # disposal_instruction = response.choices[0].text.strip()
 
     # Return the results as JSON
     return render_template('results.html', prediction=prediction, disposal_instruction=disposal_instruction)

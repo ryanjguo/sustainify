@@ -1,66 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sustainify - Identify Your Waste</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sustainify</title>
     <style>
-        /* You can add custom styles here */
-        video, canvas {
-            border: 1px solid black;
-        }
+      video,
+      canvas {
+        border: 1px solid black;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <div class="navbar">
+      <img src="PLACEHOLDER"
+    </div>
+    <div class="main-text">
+      <h1>Identify where your recycling goes!</h1>
+    </div>
+    <div class="main-body">
+      <div class="left-half">
+        <p>sustainify is a web app designed to help individuals and families make informed decisions about waste disposal. No more confusion, no more improper disposal!</p>
+        <p>This tool was inspired by the <span id="goals" href="https://sdgs.un.org/goals">Responsible Consumption and Production</span> goal of the United Nation's 17 Sustainable Development Goals.</p>
+        <button></button>
+        <hr>
+        <button></button>
+      </div>
+      <div class="right-half">
+        <form action="/upload" method="post" enctype="multipart/form-data">
+          <input type="file" name="file" /><br />
+          <br />
+          <input type="submit" value="Upload" />
+        </form>
+    
+        <!-- Webcam Video Feed -->
+        <video id="video" width="640" height="480" autoplay></video>
+    
+        <!-- Canvas for Capturing Images -->
+        <canvas id="canvas" width="640" height="480"></canvas>
+    
+        <!-- Capture Button -->
+        <button onclick="capture()">Capture</button>
+    
+        <!-- Form for Submitting Captured Images -->
+        <form id="captureForm" action="/upload-webcam" method="post" style="display: none;">
+          <input type="hidden" id="imageData" name="imageData" value="" />
+        </form>
+      </div>
+    </div>
 
-<h1>Welcome to Sustainify!</h1>
-<p>Use your webcam to identify waste items and learn how to dispose of them properly.</p>
-
-<form action="/upload" method="post" enctype="multipart/form-data">
-  <input type="file" name="file"><br><br>
-  <input type="submit" value="Upload">
-</form>
-
-
-<!-- Webcam Video Feed -->
-<video id="video" width="640" height="480" autoplay></video>
-
-<!-- Canvas for Capturing Images -->
-<canvas id="canvas" width="640" height="480"></canvas>
-
-<!-- Capture Button -->
-<button onclick="capture()">Capture</button>
-
-<!-- Form for Submitting Captured Images -->
-<form id="captureForm" action="/upload-webcam" method="post" style="display: none;">
-    <input type="hidden" id="imageData" name="imageData" value="">
-</form>
-
-<script>
-    // Initialize Webcam on Page Load
-    document.addEventListener('DOMContentLoaded', function () {
-        var video = document.getElementById('video');
+    <script>
+      // Initialize Webcam on Page Load
+      document.addEventListener("DOMContentLoaded", function () {
+        var video = document.getElementById("video");
 
         // Get Access to the Camera
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
-                video.srcObject = stream;
-                video.play();
-            });
+          navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
+            video.srcObject = stream;
+            video.play();
+          });
         }
-    });
+      });
 
-    // Capture Function for Button Click
-    function capture() {
+      // Capture Function for Button Click
+      function capture() {
         console.log("Capture button clicked");
-        var canvas = document.getElementById('canvas');
-        var video = document.getElementById('video');
-        canvas.getContext('2d').drawImage(video, 0, 0, 640, 480);
+        var canvas = document.getElementById("canvas");
+        var video = document.getElementById("video");
+        canvas.getContext("2d").drawImage(video, 0, 0, 640, 480);
         var dataURL = canvas.toDataURL();
-        document.getElementById('imageData').value = dataURL;
-        document.getElementById('captureForm').submit();
-    }
-</script>
-
-</body>
+        document.getElementById("imageData").value = dataURL;
+        document.getElementById("captureForm").submit();
+      }
+    </script>
+  </body>
 </html>
