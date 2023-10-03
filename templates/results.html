@@ -15,6 +15,7 @@
             <h2>Prediction</h2>
             <p><strong>Object Type:</strong> {{ prediction.object }}</p> 
             <p><strong>Confidence:</strong> {{ prediction.confidence }}%</p> <!-- Update according to your actual JSON structure -->
+            <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Uploaded Image">
         </div>
         <div class="col-md-6">
             <h2>Disposal Instruction</h2>

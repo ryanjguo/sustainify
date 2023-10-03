@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect
 from werkzeug.utils import secure_filename
 from roboflow import Roboflow
+from datetime import datetime
 import os
-import json
 import base64
 import openai
 
@@ -25,7 +25,7 @@ def upload_file():
         return redirect(request.url)
     if file:
         filename = secure_filename(file.filename)
-        filepath = os.path.join('uploads', filename)
+        filepath = os.path.join('static/uploads', filename)
         file.save(filepath)
         
         # Make prediction
@@ -50,7 +50,9 @@ def upload_webcam():
     image_data = request.form['imageData'].split(',')[1]  # Get the data part of the image
     image_data = base64.b64decode(image_data)  # Decode the base64 image data
 
-    image_path = 'image.png'
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    image_filename = f"image_{timestamp}.png"
+    image_path = os.path.join('static/uploads', image_filename)
     # Save the image to a file
     with open(image_path, 'wb') as image_file:
         image_file.write(image_data)
@@ -59,7 +61,6 @@ def upload_webcam():
     prediction = model.predict(image_path, confidence=40, overlap=30).json()
 
     object_type = prediction['predictions'][0]['class']
-    # prompt = f"How to properly dispose of {object_type} waste? Provide clear and concise steps or methods that are environmentally friendly and widely acceptable. Avoid repetitive or overly general advice. [max tokens=200]"
 
     response = openai.ChatCompletion.create(
     model="gpt-3.5-turbo",
@@ -69,11 +70,10 @@ def upload_webcam():
     ])
 
     disposal_instruction = response['choices'][0]['message']['content'].strip()
-    
-    # disposal_instruction = response.choices[0].text.strip()
 
     # Return the results as JSON
-    return render_template('results.html', prediction=prediction, disposal_instruction=disposal_instruction)
+    print(image_filename)
+    return render_template('results.html', filename=image_filename, prediction=prediction, disposal_instruction=disposal_instruction)
 
 @app.route('/')
 def index():
