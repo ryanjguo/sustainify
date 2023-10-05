@@ -7,5 +7,14 @@ sustainify is a web application designed to promote sustainable living by provid
 
 For this project, we used Flask, as well as HTML, CSS, and JS, to create the website. We used Python for a lot of the backend integration, including manipulating the images, and calling the APIs. We used a pre-trained model for our image detection due to the lack of time and since training our own would require many resources that we don’t possess. Once we identified the material, we passed that material into a prompt we engineered into the OpenAI API, which gets a response from a gpt-3.5 model to give users advice on how to properly dispose of this object, as well as possible side effects when that object is improperly disposed of.
 
+# Future Endeavors
+
+1) Training our own AI model instead of using a pre-trained model
+2) Mobile version of app to improve accessibility
+3) Improve performance
+4) Haing 2 sections in the app (to make it easier to use) :
+          1) Section that only states which bin to use
+          2) Section that displays the full description on proper waste disposal
+
 
 
